@@ -5,6 +5,7 @@ import java.net.*;
 
 public class Gremlin {	
 	
+
 	public static void main(String[] args){
 		
 		double prob = Float.valueOf(args[0]);
@@ -17,8 +18,9 @@ public class Gremlin {
 		return;
 		
 	}
+
 	public static DatagramPacket gremlin (DatagramPacket packet, double prob) throws IOException{
-		
+	
 		byte[] message = packet.getData();
 		
 		if (message.length == 1){
@@ -83,3 +85,4 @@ public class Gremlin {
 	}
 
 }
+
