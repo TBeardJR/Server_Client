@@ -49,23 +49,25 @@ public class Gremlin {
 					if(byteCorrupt < 5){
 						System.out.println("\nDamaging 1 byte in packet\n");
 						int oneByte = rand.nextInt(128);
+						oneByte = rand.nextInt(128);
 						message[oneByte] = message[oneByte-1];
 					}
 					else if((5 <= byteCorrupt) && (byteCorrupt < 8)){
 						System.out.println("\nDamaging 2 bytes in packet\n");
 						int firstByte = rand.nextInt(128);
+						firstByte = rand.nextInt(128);
 						message[firstByte] = message[firstByte-1];
-						int secondByte = rand.nextInt(128);
-						message[secondByte] = message[secondByte-1];
+						firstByte = rand.nextInt(128);
+						message[firstByte] = message[firstByte-1];
 					}
 					else if ((8 <= byteCorrupt) && (byteCorrupt < 10)){
 						System.out.println("\nDamaging 3 bytes in packet\n");
 						int byteOne = rand.nextInt(128);
-						int byteTwo = rand.nextInt(128);
-						int byteThree = rand.nextInt(128);
 						message[byteOne] = message[byteOne-1];
-						message[byteTwo] = message[byteTwo-1];
-						message[byteThree] = message[byteThree-1];
+						byteOne = rand.nextInt(128);
+						message[byteOne] = message[byteOne-1];
+						byteOne = rand.nextInt(128);
+						message[byteOne] = message[byteOne-1];
 					}
 					
 				}
