@@ -5,20 +5,9 @@ import java.net.*;
 
 public class Gremlin {	
 	
-	public static DatagramPacket gremlin (DatagramPacket packet, float prob, String address, int port) throws IOException{
+	public static DatagramPacket gremlin (DatagramPacket packet, double prob) throws IOException{
 	
 		byte[] message = packet.getData();
-		InetAddress ip;
-		
-		
-		if (address == "local")
-		 {
-			  ip = InetAddress.getLocalHost(); 
-		 }
-		 else 
-		 {
-			  ip = InetAddress.getByName(address);
-		 }
 		
 		if (message.length == 1){
 			return packet;
@@ -34,7 +23,7 @@ public class Gremlin {
 		
 				prob = prob * 10;
 				
-				int percent = Math.round(prob);
+				int percent = (int) Math.round(prob);
 				percent = percent * 10;
 				System.out.printf("\nProbability to damage packet: %d %%\n", percent);
 				
@@ -75,7 +64,7 @@ public class Gremlin {
 			}	
 		}
 		
-		DatagramPacket newPacket = new DatagramPacket(message,message.length,ip,port);
+		DatagramPacket newPacket = new DatagramPacket(message,message.length);
 		
 		return newPacket;
 	
