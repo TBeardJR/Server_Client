@@ -37,30 +37,43 @@ public class ClientUDP
 		 clientSocket.send(sendPacket);
 		 
 		 String newMessage = "";
-		 do {
-			 DatagramPacket recPacket = new DatagramPacket(recData, recData.length );
-			 clientSocket.receive(recPacket);
-			 byte[] pre = recPacket.getData();
-			 if(pre[0] == 0){
-				 recPacket = gremlin(recPacket, chance);
-			 }
-			 else{
-				 System.out.print("\nNull Terminator Reached: END OF FILE\n");
-				 System.exit(1);
-			 }
-			 byte[] post = recPacket.getData();
-			 newMessage = new String(recPacket.getData());
-			 System.out.println("Message Received from Server: " + newMessage.substring(16,128));
-			 boolean error = Packet.errorDetection(pre,post);
-			 if(error == true){
-				 byte[] seqNum = Arrays.copyOfRange(recPacket.getData(), 8, 16);
-				 long sNum = Packet.bytesToLong(seqNum);
-				 System.out.println("There was an ERROR DETECTED in packet " + sNum + "\n");
-				 
-			 }
-		 } while(!newMessage.contains(NULL_TERMINATOR));
-		 System.out.println("done");
-		 clientSocket.close();
+		 boolean isDone = false;
+		 try{
+			    PrintWriter writer = new PrintWriter("FinalFile.html", "UTF-8");			    
+			    do {
+					 DatagramPacket recPacket = new DatagramPacket(recData, recData.length );
+					 clientSocket.receive(recPacket);
+					 byte[] pre = recPacket.getData();
+					 if(pre[0] == 0){
+						 recPacket = gremlin(recPacket, chance);
+					 }
+					 else{
+						 System.out.print("\nNull Terminator Reached: END OF FILE\n");
+						 isDone = true;
+					 }
+					 if(!isDone) {
+						 byte[] post = recPacket.getData();
+						 newMessage = new String(recPacket.getData());
+						 System.out.println("Message Received from Server: " + newMessage.substring(16,128));
+						 writer.println(newMessage.substring(16,128));
+						 boolean error = Packet.errorDetection(pre,post);
+						 if(error == true){
+							 byte[] seqNum = Arrays.copyOfRange(recPacket.getData(), 8, 16);
+							 long sNum = Packet.bytesToLong(seqNum);
+							 System.out.println("There was an ERROR DETECTED in packet " + sNum + "\n");
+							 
+						 }
+					 }
+					
+				 } while(!isDone);
+			     writer.close();
+				 System.out.println("done");
+				 clientSocket.close();
+			} catch (IOException e) {
+			   // do something
+			}
+		 
+		 
 		 
 		 
 		 
