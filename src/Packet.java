@@ -10,10 +10,10 @@ public class Packet {
 
 	private static final String NULL_TERMINATOR = "0";
 
-	public static byte[] Segmentation(String message , DatagramSocket socket, String address , int port) throws IOException
+	public static void Segmentation(String message , DatagramSocket socket, String address , int port) throws IOException
 	{
 		InetAddress ip;
-		byte[] split_message = new byte[112];    // Packet Segmentation 
+		    // Packet Segmentation 
 		byte[] buffer = message.getBytes();
 		int i = 0;
 		int k = 0;
@@ -30,6 +30,7 @@ public class Packet {
 			long sequenceNumber = 0;
 			while ( i < buffer.length )
 			{
+				byte[] split_message = new byte[112];
 				while (k < 112 && l < buffer.length)
 				{
 						split_message[k] = buffer[k + i];
@@ -46,18 +47,17 @@ public class Packet {
 				k = 0;
 				sequenceNumber++;
 			}
-		} catch(ArrayIndexOutOfBoundsException e) {
+		}catch(ArrayIndexOutOfBoundsException e) {
 			System.out.println("k: " + k);
 			System.out.println("i: " + i);
 			System.out.println("l: " + l);
 			System.out.println("Buffer length: " + buffer.length);
-			System.out.println("Split Message length: " + split_message.length);
+		//	System.out.println("Split Message length: " + split_message.length);
 		}
 		
 		DatagramPacket pack = new DatagramPacket(NULL_TERMINATOR.getBytes(), NULL_TERMINATOR.getBytes().length, ip , port);
 		socket.send(pack);		 
 		 
-		return split_message; 
 		
 	}
 	
@@ -102,6 +102,13 @@ public class Packet {
 	    ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
 	    buffer.putLong(value);
 	    return buffer.array();
+	}
+	
+	public static long bytesToLong(byte[] bytes){
+		ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+		buffer.put(bytes, 0, bytes.length);
+		buffer.flip();
+		return buffer.getLong();
 	}
 	
 	public static byte[] joinArray(byte[]... arrays) {

@@ -12,7 +12,7 @@ public class ClientUDP
 	
 	 public void createClientSocket(String address, String prob) throws IOException
 	 {
-		 double chance = Double.parseDouble(prob);
+		 Double chance = Double.parseDouble(prob);
 		 int port = 10000;
 		 DatagramSocket clientSocket = new DatagramSocket(port);
 		 byte[] sendData = new byte[128];
@@ -30,6 +30,9 @@ public class ClientUDP
 
 		 System.out.println(ip +" is the ip address for " + address);
 		 DatagramPacket sendPacket = new DatagramPacket(sendData , sendData.length, ip, 10001);
+		 Double percent = Double.parseDouble(prob);
+		 percent = percent * 100;
+		 System.out.printf("\nProbability to damage packet: " + percent + " %%\n");
 		 System.out.println("Message Sending to Server: " + request);
 		 clientSocket.send(sendPacket);
 		 
@@ -38,16 +41,21 @@ public class ClientUDP
 			 DatagramPacket recPacket = new DatagramPacket(recData, recData.length );
 			 clientSocket.receive(recPacket);
 			 byte[] pre = recPacket.getData();
-			 recPacket = gremlin(recPacket, chance);
+			 if(pre[0] == 0){
+				 recPacket = gremlin(recPacket, chance);
+			 }
+			 else{
+				 System.out.print("\nNull Terminator Reached: END OF FILE\n");
+				 System.exit(1);
+			 }
 			 byte[] post = recPacket.getData();
 			 newMessage = new String(recPacket.getData());
-			 System.out.print("Message Received from Server: " + newMessage);
+			 System.out.println("Message Received from Server: " + newMessage.substring(16,128));
 			 boolean error = Packet.errorDetection(pre,post);
 			 if(error == true){
 				 byte[] seqNum = Arrays.copyOfRange(recPacket.getData(), 8, 16);
-				 String sNum = new String (seqNum);
-				 //int sequenceNum = Integer.parseInt(sNum);
-				 System.out.println("\nThere was an ERROR DETECTED in packet %d\n" + sNum);
+				 long sNum = Packet.bytesToLong(seqNum);
+				 System.out.println("There was an ERROR DETECTED in packet " + sNum + "\n");
 				 
 			 }
 		 } while(!newMessage.contains(NULL_TERMINATOR));
@@ -58,7 +66,7 @@ public class ClientUDP
 		 
 	 }
 	 
-	public static DatagramPacket gremlin (DatagramPacket packet, double prob) throws IOException{
+	public static DatagramPacket gremlin (DatagramPacket packet, Double prob) throws IOException{
 			
 			
 			byte[] message = packet.getData();
@@ -83,13 +91,9 @@ public class ClientUDP
 			
 			if(chanceToDamage % 2 == 0){
 			
-				if ((0.0 <= prob) && (prob <= 1.0)){
+				if ((0.0 < prob) && (prob <= 1.0)){
 				
 					prob = prob * 10;
-					
-					int percent = (int) Math.round(prob);
-					percent = percent * 10;
-					System.out.printf("\nProbability to damage packet: %d %%\n", percent);
 					
 					Random rand2 = new Random();
 					int damage = rand2.nextInt(10);
@@ -125,6 +129,9 @@ public class ClientUDP
 					}
 					
 				}	
+			}
+			else{
+				return packet;
 			}
 			
 	
