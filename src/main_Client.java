@@ -9,7 +9,7 @@ public class main_Client
 		try
 		{
 			ClientUDP client = new ClientUDP();
-			client.createClientSocket(auburn_tux, arg[0]);
+			client.createClientSocket("local", arg[0]);
 		}
 		catch (IOException e)
 		{
