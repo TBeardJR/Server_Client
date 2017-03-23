@@ -9,11 +9,12 @@ public class main_Client
 		try
 		{
 			ClientUDP client = new ClientUDP();
-			client.createClientSocket("local");
+			client.createClientSocket("local", arg[0]);
 		}
 		catch (IOException e)
 		{
 			System.out.print("Failed");
+			e.printStackTrace();
 		}
 		
 	

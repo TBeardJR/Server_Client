@@ -22,12 +22,17 @@ public class Gremlin {
 	public static DatagramPacket gremlin (DatagramPacket packet, double prob) throws IOException{
 	
 		byte[] message = packet.getData();
+		byte[] damageArray = new byte[128];
+		
 		
 		if (message.length == 1){
 			return packet;
 		}
 		
 		Random rand = new Random();
+		
+		rand.nextBytes(damageArray);
+		
 		
 		int chanceToDamage = rand.nextInt();
 		
@@ -53,24 +58,24 @@ public class Gremlin {
 						System.out.println("\nDamaging 1 byte in packet\n");
 						int oneByte = rand.nextInt(128);
 						oneByte = rand.nextInt(128);
-						message[oneByte] = message[oneByte-1];
+						message[oneByte] = damageArray[oneByte];
 					}
 					else if((5 <= byteCorrupt) && (byteCorrupt < 8)){
 						System.out.println("\nDamaging 2 bytes in packet\n");
 						int firstByte = rand.nextInt(128);
 						firstByte = rand.nextInt(128);
-						message[firstByte] = message[firstByte-1];
+						message[firstByte] = damageArray[firstByte];
 						firstByte = rand.nextInt(128);
-						message[firstByte] = message[firstByte-1];
+						message[firstByte] = damageArray[firstByte];
 					}
 					else if ((8 <= byteCorrupt) && (byteCorrupt < 10)){
 						System.out.println("\nDamaging 3 bytes in packet\n");
 						int byteOne = rand.nextInt(128);
-						message[byteOne] = message[byteOne-1];
+						message[byteOne] = damageArray[byteOne];
 						byteOne = rand.nextInt(128);
-						message[byteOne] = message[byteOne-1];
+						message[byteOne] = damageArray[byteOne];
 						byteOne = rand.nextInt(128);
-						message[byteOne] = message[byteOne-1];
+						message[byteOne] = damageArray[byteOne];
 					}
 					
 				}

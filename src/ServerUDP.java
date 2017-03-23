@@ -41,7 +41,7 @@ public class ServerUDP
 				System.out.println("Sending response object to client.");
 				DatagramPacket pack = new DatagramPacket(response.getBytes(), response.getBytes().length, InetAddress.getLocalHost(), 9999);
 				serverSocket.send(pack);	
-				Packet.Segmentation(message, serverSocket, "local", 9999);
+				Packet.Segmentation(message, serverSocket, "local", 10000);
 				System.out.println("Response object sent to client.");
 			}
 				catch (SocketTimeoutException s)
