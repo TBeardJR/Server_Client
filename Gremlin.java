@@ -19,6 +19,10 @@ public class Gremlin {
 			  ip = InetAddress.getByName(address);
 		 }
 		
+		if (message.length == 1){
+			return packet;
+		}
+		
 		Random rand = new Random();
 		
 		int chanceToDamage = rand.nextInt();
