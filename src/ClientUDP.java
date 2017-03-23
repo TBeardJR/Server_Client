@@ -67,7 +67,7 @@ public class ClientUDP
 					
 				 } while(!isDone);
 			     writer.close();
-				 System.out.println("done");
+				 System.out.println("FinalFile.html was created and written to in the current directory.");
 				 clientSocket.close();
 			} catch (IOException e) {
 			   // do something
