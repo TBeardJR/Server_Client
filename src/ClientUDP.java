@@ -46,8 +46,8 @@ public class ClientUDP
 			 if(error == true){
 				 byte[] seqNum = Arrays.copyOfRange(recPacket.getData(), 8, 16);
 				 String sNum = new String (seqNum);
-				 int sequenceNum = Integer.parseInt(sNum);
-				 System.out.println("\nThere was an ERROR DETECTED in packet %d\n" + sequenceNum);
+				 //int sequenceNum = Integer.parseInt(sNum);
+				 System.out.println("\nThere was an ERROR DETECTED in packet %d\n" + sNum);
 				 
 			 }
 		 } while(!newMessage.contains(NULL_TERMINATOR));
