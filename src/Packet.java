@@ -99,13 +99,13 @@ public class Packet {
 	
 	
 	private static byte[] longToBytes(long value) {
-	    ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+	    ByteBuffer buffer = ByteBuffer.allocate(8);
 	    buffer.putLong(value);
 	    return buffer.array();
 	}
 	
 	public static long bytesToLong(byte[] bytes){
-		ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+		ByteBuffer buffer = ByteBuffer.allocate(8);
 		buffer.put(bytes, 0, bytes.length);
 		buffer.flip();
 		return buffer.getLong();
