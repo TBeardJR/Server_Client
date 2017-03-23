@@ -44,7 +44,7 @@ public class Packet {
 				socket.send(pack);
 				i = l;
 				k = 0;
-				
+				sequenceNumber++;
 			}
 		} catch(ArrayIndexOutOfBoundsException e) {
 			System.out.println("k: " + k);
@@ -84,13 +84,27 @@ public class Packet {
 		return checkSum;
 	}
 	
+	public static boolean errorDetection(byte[] pre, byte[] post){
+		
+		long preChecksum = checkSum(pre);
+		long postChecksum = checkSum(post);
+		
+		if (preChecksum == postChecksum){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	
+	
 	private static byte[] longToBytes(long value) {
 	    ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
 	    buffer.putLong(value);
 	    return buffer.array();
 	}
 	
-	private static byte[] joinArray(byte[]... arrays) {
+	public static byte[] joinArray(byte[]... arrays) {
         int length = 0;
         for (byte[] array : arrays) {
             length += array.length;

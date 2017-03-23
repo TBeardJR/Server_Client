@@ -30,15 +30,26 @@ public class ClientUDP
 
 		 System.out.println(ip +" is the ip address for " + address);
 		 DatagramPacket sendPacket = new DatagramPacket(sendData , sendData.length, ip, 10001);
+		 System.out.println("Message Sending to Server: " + request);
 		 clientSocket.send(sendPacket);
 		 
 		 String newMessage = "";
 		 do {
 			 DatagramPacket recPacket = new DatagramPacket(recData, recData.length );
 			 clientSocket.receive(recPacket);
+			 byte[] pre = recPacket.getData();
 			 recPacket = gremlin(recPacket, chance);
+			 byte[] post = recPacket.getData();
 			 newMessage = new String(recPacket.getData());
-			 System.out.print(newMessage);
+			 System.out.print("Message Received from Server: " + newMessage);
+			 boolean error = Packet.errorDetection(pre,post);
+			 if(error == true){
+				 byte[] seqNum = Arrays.copyOfRange(recPacket.getData(), 8, 16);
+				 String sNum = new String (seqNum);
+				 int sequenceNum = Integer.parseInt(sNum);
+				 System.out.println("\nThere was an ERROR DETECTED in packet %d\n" + sequenceNum);
+				 
+			 }
 		 } while(!newMessage.contains(NULL_TERMINATOR));
 		 System.out.println("done");
 		 clientSocket.close();
@@ -49,17 +60,17 @@ public class ClientUDP
 	 
 	public static DatagramPacket gremlin (DatagramPacket packet, double prob) throws IOException{
 			
-			System.out.println("\nNOW INSIDE GREMLIN FUNCTION\n");
 			
 			byte[] message = packet.getData();
 			byte[] damageArray = new byte[128];
 			
 			
 			byte[] message1 = Arrays.copyOfRange(message, 16,128);
-			byte[] header = Arrays.copyOfRange(message1, 0, 16);
+			byte[] header = Arrays.copyOfRange(message, 0, 16);
 			
 			if ((message.length == 1)){
 				System.out.println("\nLAST PACKET\n");
+				System.out.println("\nFILE CLOSED\n");
 				return packet;
 			}
 				
@@ -117,11 +128,9 @@ public class ClientUDP
 			}
 			
 	
-			ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
-			outputStream.write(header);
-			outputStream.write(message1);
+			
 
-			byte newMessage[] = outputStream.toByteArray( );
+			byte newMessage[] = Packet.joinArray(header,message1);
 			
 			DatagramPacket newPacket = new DatagramPacket(newMessage, newMessage.length);
 			
