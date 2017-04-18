@@ -32,7 +32,7 @@ public class Packet {
 			int waitCounter = 0;
 			while ( i < buffer.length )
 			{
-				byte[] split_message = new byte[497];
+				byte[] split_message = new byte[496];
 				while (k < 112 && l < buffer.length)
 				{
 						split_message[k] = buffer[k + i];
