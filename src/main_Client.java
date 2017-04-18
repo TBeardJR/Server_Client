@@ -9,7 +9,9 @@ public class main_Client
 		try
 		{
 			ClientUDP client = new ClientUDP();
-			client.createClientSocket("local", arg[0]);
+			
+			//Corrupt Probability - Packet Loss Probability - Packet Delay Probability - Packet Delay Time
+			client.createClientSocket("local", arg[0], arg[1], arg[2], arg[3]);
 		}
 		catch (IOException e)
 		{
