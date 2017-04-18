@@ -12,6 +12,7 @@ public class Packet {
 
 	public static void Segmentation(String message , DatagramSocket socket, String address , int port) throws IOException
 	{
+		byte[] recData = new byte[128];
 		InetAddress ip;
 		    // Packet Segmentation 
 		byte[] buffer = message.getBytes();
@@ -27,10 +28,11 @@ public class Packet {
 			  ip = InetAddress.getByName(address);
 		 }
 		try {
-			long sequenceNumber = 0;
+			long sequenceNumber = 64;
+			int waitCounter = 0;
 			while ( i < buffer.length )
 			{
-				byte[] split_message = new byte[112];
+				byte[] split_message = new byte[496];
 				while (k < 112 && l < buffer.length)
 				{
 						split_message[k] = buffer[k + i];
@@ -43,9 +45,16 @@ public class Packet {
 				final byte[] finalMessage = joinArray(checksumBytes, sequenceNumberBytes, split_message);
 				DatagramPacket pack = new DatagramPacket(finalMessage, finalMessage.length, ip , port);
 				socket.send(pack);
+				if(waitCounter == 31) {
+					DatagramPacket recPacket = new DatagramPacket(recData, recData.length);
+					socket.setSoTimeout(10000);
+					socket.receive(recPacket);
+					waitCounter = 0;
+				}				
 				i = l;
 				k = 0;
-				sequenceNumber++;
+				sequenceNumber+=64;
+				waitCounter++;
 			}
 		}catch(ArrayIndexOutOfBoundsException e) {
 			System.out.println("k: " + k);
