@@ -16,11 +16,15 @@ public class ClientUDP
 		 Double loseChance = Double.parseDouble(lose);
 		 Double delayChance = Double.parseDouble(delay);
 		 Integer delayTime = Integer.parseInt(time);
+		 int waitCounter = 0;
 		 
 		 int port = 10000;
 		 DatagramSocket clientSocket = new DatagramSocket(port);
-		 byte[] sendData = new byte[128];
-		 byte[] recData = new byte[128];
+		 byte[] sendData = new byte[512];
+		 byte[] recData = new byte[512];
+		 byte[] ACK = new byte[128];
+		 byte[] NAK = new byte[128];
+		 
 		 sendData = request.getBytes();
 		 if (address == "local")
 		 {
@@ -64,8 +68,15 @@ public class ClientUDP
 					 if(!isDone) {
 						 byte[] post = recPacket.getData();
 						 newMessage = new String(recPacket.getData());
-						 System.out.println("Message Received from Server: " + newMessage.substring(16,128));
-						 writer.println(newMessage.substring(16,128));
+						 System.out.println("Message Received from Server: " + newMessage.substring(16,512));
+						 writer.println(newMessage.substring(16,512));
+						 if(waitCounter == 31){
+							 DatagramPacket ACKPacket = new DatagramPacket(ACK , ACK.length, ip, 10001);
+							 clientSocket.send(ACKPacket);
+							 waitCounter = 0;
+							 System.out.println("ACK SENT");
+						 }
+						 waitCounter++;
 						 boolean error = Packet.errorDetection(pre,post);
 						 if(error == true){
 							 byte[] seqNum = Arrays.copyOfRange(recPacket.getData(), 8, 16);

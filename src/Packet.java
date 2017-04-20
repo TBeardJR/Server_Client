@@ -49,6 +49,7 @@ public class Packet {
 					DatagramPacket recPacket = new DatagramPacket(recData, recData.length);
 					socket.setSoTimeout(10000);
 					socket.receive(recPacket);
+					System.out.println("ACK RECEIVED");
 					waitCounter = 0;
 				}				
 				i = l;
