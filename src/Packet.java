@@ -12,8 +12,14 @@ public class Packet {
 
 	public static void Segmentation(String message , DatagramSocket socket, String address , int port) throws IOException
 	{
-		byte[] recData = new byte[128];
+		byte[] recData = new byte[48];
 		InetAddress ip;
+		DatagramSocket ACKSocket;
+		//DatagramSocket NAKSocket;
+		
+		ACKSocket = new DatagramSocket(10002);
+		//NAKSocket = new DatagramSocket(10000);
+		
 		    // Packet Segmentation 
 		byte[] buffer = message.getBytes();
 		int i = 0;
@@ -46,9 +52,11 @@ public class Packet {
 				DatagramPacket pack = new DatagramPacket(finalMessage, finalMessage.length, ip , port);
 				socket.send(pack);
 				if(waitCounter == 31) {
-					DatagramPacket recPacket = new DatagramPacket(recData, recData.length);
-					socket.setSoTimeout(10000);
-					socket.receive(recPacket);
+					DatagramPacket recPacket = new DatagramPacket(recData, recData.length, ip, 10002);
+					ACKSocket.setSoTimeout(10000);
+					ACKSocket.receive(recPacket);
+					//socket.setSoTimeout(10000);
+					//socket.receive(recPacket);
 					System.out.println("ACK RECEIVED");
 					waitCounter = 0;
 				}				
@@ -67,6 +75,8 @@ public class Packet {
 		
 		DatagramPacket pack = new DatagramPacket(NULL_TERMINATOR.getBytes(), NULL_TERMINATOR.getBytes().length, ip , port);
 		socket.send(pack);		 
+		//ACKSocket.close();
+		//NAKSocket.close();
 		 
 		
 	}

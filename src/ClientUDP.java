@@ -17,13 +17,14 @@ public class ClientUDP
 		 Double delayChance = Double.parseDouble(delay);
 		 Integer delayTime = Integer.parseInt(time);
 		 int waitCounter = 0;
+		 int packetcount = 0;
 		 
 		 int port = 10000;
 		 DatagramSocket clientSocket = new DatagramSocket(port);
 		 byte[] sendData = new byte[512];
 		 byte[] recData = new byte[512];
-		 byte[] ACK = new byte[128];
-		 byte[] NAK = new byte[128];
+		 byte[] ACK = new byte[48];
+		// byte[] NAK = new byte[49];
 		 
 		 sendData = request.getBytes();
 		 if (address == "local")
@@ -69,9 +70,10 @@ public class ClientUDP
 						 byte[] post = recPacket.getData();
 						 newMessage = new String(recPacket.getData());
 						 System.out.println("Message Received from Server: " + newMessage.substring(16,512));
+						 packetcount++;
 						 writer.println(newMessage.substring(16,512));
 						 if(waitCounter == 31){
-							 DatagramPacket ACKPacket = new DatagramPacket(ACK , ACK.length, ip, 10001);
+							 DatagramPacket ACKPacket = new DatagramPacket(ACK , ACK.length, ip, 10002);
 							 clientSocket.send(ACKPacket);
 							 waitCounter = 0;
 							 System.out.println("ACK SENT");
@@ -89,6 +91,7 @@ public class ClientUDP
 				 } while(!isDone);
 			     writer.close();
 				 System.out.println("FinalFile.html was created and written to in the current directory.");
+				 System.out.println("\n" + packetcount);
 				 clientSocket.close();
 			} catch (IOException e) {
 			   // do something
