@@ -6,19 +6,21 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
 
+
+
 public class Packet {
 
 	private static final String NULL_TERMINATOR = "0";
+	
+	public static InetAddress ip;
 
+	
 	public static void Segmentation(String message , DatagramSocket socket, String address , int port) throws IOException
 	{
 		byte[] recData = new byte[48];
 		InetAddress ip;
 		DatagramSocket ACKSocket;
-		//DatagramSocket NAKSocket;
-		
 		ACKSocket = new DatagramSocket(10002);
-		//NAKSocket = new DatagramSocket(10000);
 		
 		    // Packet Segmentation 
 		byte[] buffer = message.getBytes();
@@ -49,17 +51,43 @@ public class Packet {
 				byte[] checksumBytes = longToBytes(checkSum);
 				byte[] sequenceNumberBytes = longToBytes(sequenceNumber);
 				final byte[] finalMessage = joinArray(checksumBytes, sequenceNumberBytes, split_message);
+				
 				DatagramPacket pack = new DatagramPacket(finalMessage, finalMessage.length, ip , port);
+				
 				socket.send(pack);
+					
+				
 				if(waitCounter == 31) {
 					DatagramPacket recPacket = new DatagramPacket(recData, recData.length, ip, 10002);
 					ACKSocket.setSoTimeout(10000);
 					ACKSocket.receive(recPacket);
 					//socket.setSoTimeout(10000);
 					//socket.receive(recPacket);
-					System.out.println("ACK RECEIVED");
+					System.out.println("ACK RECEIVED\n");
 					waitCounter = 0;
-				}				
+					}
+				
+					DatagramPacket nakPacket = new DatagramPacket(recData,recData.length,ip,10002);
+					ACKSocket.receive(nakPacket);
+					
+					byte[] byteArray = new byte[48];
+					byteArray = nakPacket.getData();
+					int sum = 0;
+					for(int b = 0; b < 40; b++){
+						sum = sum + byteArray[b];
+					}
+					if(sum == 40){
+						byte[] seqNum = Arrays.copyOfRange(nakPacket.getData(), 40, 48);
+						long sNum = Packet.bytesToLong(seqNum);
+						System.out.println("NAK RECEIVED FROM PACKET NUMBER: " + sNum + "\n");
+						long packetNumber = sNum / 64;
+						l = (int) (512 * packetNumber);
+						System.out.println("RESENDING PACKET SEQUENCE NUMBER: " + sNum + "\n");
+					}
+					
+					//waitCounter = 0;
+					
+				
 				i = l;
 				k = 0;
 				sequenceNumber+=64;
@@ -75,11 +103,11 @@ public class Packet {
 		
 		DatagramPacket pack = new DatagramPacket(NULL_TERMINATOR.getBytes(), NULL_TERMINATOR.getBytes().length, ip , port);
 		socket.send(pack);		 
-		//ACKSocket.close();
-		//NAKSocket.close();
-		 
+		ACKSocket.close();
+		
 		
 	}
+	
 	
 	public static String Assemble (byte[] message)
 	{

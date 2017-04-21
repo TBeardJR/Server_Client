@@ -11,7 +11,7 @@ public class main_Client
 			ClientUDP client = new ClientUDP();
 			
 			//Corrupt Probability - Packet Loss Probability - Packet Delay Probability - Packet Delay Time
-			client.createClientSocket("local", "0", "0", "0", "3");
+			client.createClientSocket("local", arg[0], arg[1], arg[2], arg[3]);
 		}
 		catch (IOException e)
 		{

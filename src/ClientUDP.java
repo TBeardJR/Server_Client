@@ -25,7 +25,14 @@ public class ClientUDP
 		 byte[] sendData = new byte[512];
 		 byte[] recData = new byte[512];
 		 byte[] ACK = new byte[48];
-		// byte[] NAK = new byte[49];
+		 byte[] NAK = new byte[48];
+		 
+		 for(int a = 0; a < ACK.length; a++){
+			 	ACK[a] = 0;
+		 }
+		 for(int b = 0; b < NAK.length; b++){
+			 NAK[b] = 1;
+		 }
 		 
 		 sendData = request.getBytes();
 		 if (address == "local")
@@ -71,13 +78,15 @@ public class ClientUDP
 						 byte[] post = recPacket.getData();
 						 newMessage = new String(recPacket.getData());
 						 System.out.println("Message Received from Server: " + newMessage.substring(16,512));
+						 DatagramPacket testpacket = new DatagramPacket(ACK, NAK.length,ip,10002);
+						 clientSocket.send(testpacket);
 						 packetcount++;
 						 writer.println(newMessage.substring(16,512));
 						 if(waitCounter == 31){
 							 DatagramPacket ACKPacket = new DatagramPacket(ACK , ACK.length, ip, 10002);
 							 clientSocket.send(ACKPacket);
 							 waitCounter = 0;
-							 System.out.println("ACK SENT");
+							 System.out.println("\nACK SENT\n");
 						 }
 						 waitCounter++;
 						 boolean error = Packet.errorDetection(pre,post);
@@ -85,6 +94,16 @@ public class ClientUDP
 							 byte[] seqNum = Arrays.copyOfRange(recPacket.getData(), 8, 16);
 							 long sNum = Packet.bytesToLong(seqNum);
 							 System.out.println("There was an ERROR DETECTED in packet " + sNum + "\n");
+							 byte[] seqNAK = new byte[40];
+							 for(int c = 0; c < seqNAK.length; c++){
+								 seqNAK[c] = 1;
+							 }
+							 seqNAK = Packet.joinArray(seqNAK,seqNum);
+							 //DatagramPacket NAKPacket = new DatagramPacket(NAK, NAK.length,ip,10002);
+							 DatagramPacket NAKPacket = new DatagramPacket(seqNAK,seqNAK.length,ip,10002);
+							 clientSocket.send(NAKPacket);
+							 System.out.println("NAK SENT\n");
+							 
 							 
 						 }
 					 }
@@ -92,7 +111,7 @@ public class ClientUDP
 				 } while(!isDone);
 			     writer.close();
 				 System.out.println("FinalFile.html was created and written to in the current directory.");
-				 System.out.println("\n" + packetcount);
+				 System.out.println("\nFinal Packet Count After GBN Implementation: " + packetcount);
 				 clientSocket.close();
 			} catch (IOException e) {
 			   // do something
