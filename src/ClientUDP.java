@@ -9,6 +9,7 @@ public class ClientUDP
 	public String request = "GET TestFile.html HTTP/1.0";
 	private InetAddress ip;
 	private static final String NULL_TERMINATOR = "/0";
+	private int message_length = 0 ;
 	
 	 public void createClientSocket(String address, String prob, String lose, String delay, String time) throws IOException
 	 {
@@ -60,7 +61,7 @@ public class ClientUDP
 					 clientSocket.receive(recPacket);
 					 byte[] pre = recPacket.getData();
 					 if(pre[0] == 0){
-						 recPacket = gremlin(recPacket, chance, loseChance, delayChance, delayTime);
+						 recPacket = Packet.gremlin(recPacket, chance, loseChance, delayChance, delayTime);
 					 }
 					 else{
 						 System.out.print("\nNull Terminator Reached: END OF FILE\n");
@@ -103,116 +104,7 @@ public class ClientUDP
 		 
 	 }
 	 
-	public static DatagramPacket gremlin (DatagramPacket packet, Double prob, Double loseProb, Double delayProb, int delayTime) throws IOException{
-			
-			
-			byte[] message = packet.getData();
-			byte[] damageArray = new byte[512];
-			
-			
-			byte[] message1 = Arrays.copyOfRange(message, 16, 512);
-			byte[] header = Arrays.copyOfRange(message, 0, 16);
-			
-			if ((message.length == 1)){
-				System.out.println("\nLAST PACKET\n");
-				System.out.println("\nFILE CLOSED\n");
-				return packet;
-			}
-				
-			
-			Random rand = new Random();
-			Random option = new Random();
-			
-			rand.nextBytes(damageArray);
-			
-			int chanceToDamage = rand.nextInt();
-			int optionToChoose = option.nextInt(3);
-			
-			if(chanceToDamage % 2 == 0){
-			
-				if ((0.0 <= prob) && (prob <= 1.0) && (0.0 <= loseProb) && (loseProb <= 1.0) && (0.0 <= delayProb) && (delayProb <= 1.0)){
-				
-					prob = prob * 10;
-					loseProb = loseProb * 10;
-					delayProb = delayProb * 10;
-					
-					Random rand2 = new Random();
-					int damage = rand2.nextInt(10);
-					if(optionToChoose == 0){
-						if (damage < prob){
-							
-							Random rand3 = new Random();
-							int byteCorrupt = rand3.nextInt(10);
-						
-							if(byteCorrupt < 5){
-								System.out.println("\nDamaging 1 byte in packet!\n");
-								int oneByte = rand.nextInt(496);
-								oneByte = rand.nextInt(496);
-								message1[oneByte] = damageArray[oneByte];
-							}
-							else if((5 <= byteCorrupt) && (byteCorrupt < 8)){
-								System.out.println("\nDamaging 2 bytes in packet!\n");
-								int firstByte = rand.nextInt(496);
-								firstByte = rand.nextInt(496);
-								message1[firstByte] = damageArray[firstByte];
-								firstByte = rand.nextInt(496);
-								message1[firstByte] = damageArray[firstByte];
-							}
-							else if ((8 <= byteCorrupt) && (byteCorrupt < 10)){
-								System.out.println("\nDamaging 3 bytes in packet!\n");
-								int byteOne = rand.nextInt(496);
-								message1[byteOne] = damageArray[byteOne];
-								byteOne = rand.nextInt(496);
-								message1[byteOne] = damageArray[byteOne];
-								byteOne = rand.nextInt(496);
-								message1[byteOne] = damageArray[byteOne];
-							}
-						}
-					}
-					else if (optionToChoose == 1){
-							int loseIt = rand.nextInt(10);
-							//when packet is lost, all bytes are made 0
-							if (loseIt < loseProb){
-							System.out.println("\nPACKET LOST!\n");
-							byte newMessage[] = Packet.joinArray(header,message1);
-							for(int i = 16; i < 512; i++){
-									newMessage[i] = 0;
-							}
-							DatagramPacket newPacket = new DatagramPacket(newMessage, newMessage.length);
-							return newPacket;
-						}
-					}
-					else if (optionToChoose == 2){
-							int delayIt = rand.nextInt(10);
-							
-							try{
-								if(delayIt < delayProb){	
-								long delaytime = (long)delayTime;
-								Thread.sleep(delaytime);
-								System.out.println("\nPACKET DELAYED FOR " + delayTime + " MILLISECONDS!\n");
-								}
-							}
-							catch (InterruptedException e){
-								e.printStackTrace();
-							}
-					}
-					}
-			
-				}	
-			else{
-				return packet;
-			}
-			
 	
-			
-
-			byte newMessage[] = Packet.joinArray(header,message1);
-			
-			DatagramPacket newPacket = new DatagramPacket(newMessage, newMessage.length);
-			
-			return newPacket;
-		
-		}
 	 
 
 }
